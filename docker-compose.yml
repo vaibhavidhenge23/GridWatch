@@ -5,7 +5,7 @@ services:
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: "password123"
+      POSTGRES_PASSWORD: password123
       POSTGRES_DB: gridwatch
     ports:
       - "5432:5432"
@@ -26,11 +26,11 @@ services:
   backend:
     build: ./backend
     ports:
-      - "3001:3001"
+      - "3000:3000"
     environment:
-      DATABASE_URL: postgres://postgres:POSTGRES_PASSWORD@postgres:5432/gridwatch
+      DATABASE_URL: postgres://postgres:password123@postgres:5432/gridwatch
       REDIS_URL: redis://redis:6379
-      PORT: 3001
+      PORT: 3000
       JWT_SECRET: gridwatch-local-secret
     depends_on:
       postgres:
@@ -41,9 +41,9 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "3000:3000"
+      - "5173:5173"
     environment:
-      VITE_API_URL: http://localhost:3001
+      VITE_API_URL: http://localhost:3000
     depends_on:
       - backend
 
