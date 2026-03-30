@@ -30,7 +30,7 @@ router.post('/', async (req, res) => {
   const placeholders = readings.map((r, i) => {
     const base = i * 6
     values.push(r.sensor_id, r.timestamp, r.voltage ?? null, r.current ?? null, r.temperature ?? null, r.status_code ?? null)
-    return `($${base+1},$${base+2},$${base+3},$${base+4},$${base+5},$${base+6})`
+    return `($${base + 1},$${base + 2},$${base + 3},$${base + 4},$${base + 5},$${base + 6})`
   }).join(',')
 
   let insertedIds: string[]

@@ -12,12 +12,14 @@ function App() {
   const [selectedSensor, setSelectedSensor] = useState<string | null>(null)
 
   if (!user) return <Login />
-  if (page === 'alerts') return <AlertsPanel />
+  if (page === 'alerts') return <AlertsPanel onBack={() => setPage('dashboard')} />
   if (page === 'sensor' && selectedSensor)
     return <SensorDetail sensorId={selectedSensor} onBack={() => setPage('dashboard')} />
-
   return (
-    <Dashboard onSelectSensor={(id) => { setSelectedSensor(id); setPage('sensor') }} />
+    <Dashboard
+      onSelectSensor={(id) => { setSelectedSensor(id); setPage('sensor') }}
+      onAlerts={() => setPage('alerts')}
+    />
   )
 }
 

@@ -10,29 +10,29 @@ interface Sensor {
 }
 
 const stateColors: Record<SensorState, string> = {
-  healthy:  'bg-green-500',
-  warning:  'bg-yellow-500',
+  healthy: 'bg-green-500',
+  warning: 'bg-yellow-500',
   critical: 'bg-red-500 animate-pulse',
-  silent:   'bg-gray-500',
+  silent: 'bg-gray-500',
 }
 const stateBadge: Record<SensorState, string> = {
-  healthy:  'text-green-400 bg-green-400/10',
-  warning:  'text-yellow-400 bg-yellow-400/10',
+  healthy: 'text-green-400 bg-green-400/10',
+  warning: 'text-yellow-400 bg-yellow-400/10',
   critical: 'text-red-400 bg-red-400/10',
-  silent:   'text-gray-400 bg-gray-400/10',
+  silent: 'text-gray-400 bg-gray-400/10',
 }
 
-export default function Dashboard({ onSelectSensor }: { onSelectSensor: (id: string) => void }) {
+export default function Dashboard({ onSelectSensor, onAlerts }: {
+  onSelectSensor: (id: string) => void
+  onAlerts: () => void
+}) {
   const { user, logout } = useAuth()
   const [sensors, setSensors] = useState<Sensor[]>([])
   const [filter, setFilter] = useState<SensorState | 'all'>('all')
   const [search, setSearch] = useState('')
 
-  useEffect(() => {
-    api.getSensors().then(setSensors)
-  }, [])
+  useEffect(() => { api.getSensors().then(setSensors) }, [])
 
-  // SSE — update sensor state in-place without full refetch
   useSSE(useCallback((event, data: any) => {
     if (event === 'sensor_state_change') {
       setSensors(prev => prev.map(s =>
@@ -52,34 +52,28 @@ export default function Dashboard({ onSelectSensor }: { onSelectSensor: (id: str
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      {/* Header */}
       <div className="border-b border-gray-800 px-6 py-4 flex items-center justify-between">
         <div>
           <h1 className="text-lg font-semibold">GridWatch</h1>
           <p className="text-gray-400 text-xs">{user?.name} · {user?.role}</p>
         </div>
         <div className="flex gap-3 items-center">
-          <a href="/alerts" className="text-sm text-gray-400 hover:text-white transition-colors">Alerts</a>
+          <button onClick={onAlerts} className="text-sm text-gray-400 hover:text-white transition-colors">Alerts</button>
           <button onClick={logout} className="text-sm text-gray-500 hover:text-white">Sign out</button>
         </div>
       </div>
 
-      {/* Status bar */}
-      <div className="px-6 py-4 flex gap-4 border-b border-gray-800">
+      <div className="px-6 py-4 flex gap-4 border-b border-gray-800 flex-wrap">
         {(['all', 'healthy', 'warning', 'critical', 'silent'] as const).map(s => (
           <button key={s} onClick={() => setFilter(s)}
             className={`text-sm px-3 py-1 rounded-full transition-colors ${filter === s ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'}`}>
             {s === 'all' ? `All (${sensors.length})` : `${s} (${counts[s] || 0})`}
           </button>
         ))}
-        <input
-          placeholder="Search sensors..."
-          value={search} onChange={e => setSearch(e.target.value)}
-          className="ml-auto bg-gray-800 border border-gray-700 text-sm text-white rounded-lg px-3 py-1 focus:outline-none focus:border-blue-500 w-48"
-        />
+        <input placeholder="Search sensors..." value={search} onChange={e => setSearch(e.target.value)}
+          className="ml-auto bg-gray-800 border border-gray-700 text-sm text-white rounded-lg px-3 py-1 focus:outline-none focus:border-blue-500 w-48" />
       </div>
 
-      {/* Sensor grid */}
       <div className="p-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
         {visible.map(sensor => (
           <button key={sensor.id} onClick={() => onSelectSensor(sensor.id)}
@@ -92,9 +86,7 @@ export default function Dashboard({ onSelectSensor }: { onSelectSensor: (id: str
             <p className="text-xs text-gray-500 truncate">{sensor.zone_name}</p>
           </button>
         ))}
-        {visible.length === 0 && (
-          <p className="text-gray-500 text-sm col-span-full">No sensors match filter.</p>
-        )}
+        {visible.length === 0 && <p className="text-gray-500 text-sm col-span-full">No sensors match.</p>}
       </div>
     </div>
   )

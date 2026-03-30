@@ -16,7 +16,7 @@ export default function SensorDetail({ sensorId, onBack }: { sensorId: string; o
   const [reason, setReason] = useState('')
 
   useEffect(() => {
-    api.getSensorHistory(sensorId, undefined, undefined, page).then(d => setReadings(d.data))
+    api.getSensorHistory(sensorId, undefined, undefined, page).then(d => setReadings(d.data || []))
   }, [sensorId, page])
 
   async function suppress() {
@@ -64,9 +64,9 @@ export default function SensorDetail({ sensorId, onBack }: { sensorId: string; o
               <span className="text-gray-400 text-xs w-40 shrink-0">
                 {new Date(r.timestamp).toLocaleString()}
               </span>
-              <span className="text-white w-24">⚡ {r.voltage?.toFixed(1)}V</span>
-              <span className="text-white w-24">⚡ {r.current?.toFixed(2)}A</span>
-              <span className="text-white w-24">🌡 {r.temperature?.toFixed(1)}°C</span>
+              <span className="text-white w-24">⚡ {r.voltage != null ? Number(r.voltage).toFixed(1) : '-'}V</span>
+              <span className="text-white w-24">⚡ {r.current != null ? Number(r.current).toFixed(2) : '-'}A</span>
+              <span className="text-white w-24">🌡 {r.temperature != null ? Number(r.temperature).toFixed(1) : '-'}°C</span>
               {r.has_anomaly && (
                 <span className="text-red-400 text-xs ml-auto">
                   {r.anomalies?.map(a => a.rule_type).join(', ')}

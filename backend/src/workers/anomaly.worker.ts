@@ -41,7 +41,7 @@ export function startAnomalyWorker() {
           const value = reading[rule.metric]
           if (value !== null) {
             if ((rule.min_value !== null && value < rule.min_value) ||
-                (rule.max_value !== null && value > rule.max_value)) {
+              (rule.max_value !== null && value > rule.max_value)) {
               triggered = true
               detail = { metric: rule.metric, value, min: rule.min_value, max: rule.max_value }
             }
